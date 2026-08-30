@@ -1,0 +1,2 @@
+recursive-include KSPADA/resources *.gmt *.txt
+recursive-include tutorials *.ipynb

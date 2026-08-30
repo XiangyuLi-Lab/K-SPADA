@@ -1,0 +1,33 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+build/
+dist/
+
+# Large data and model artifacts should be shared outside Git.
+*.h5ad
+*.h5
+*.loom
+*.pth
+*.pt
+*.ckpt
+*.npy
+*.npz
+*.csv
+*.tsv
+*.parquet
+
+# KSPADA runtime outputs.
+predict_result/
+train_attention/
+*_epoch*/
+*epoch*/
+model-*.pth
+mask.npy
+pathway.csv
+label_dictionary.csv
+gene2token_weights.csv
