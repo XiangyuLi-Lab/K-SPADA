@@ -446,3 +446,8 @@ def prepare_data_workflow(
         "query_graph_paths": graph_query_paths,
         "train_valid_h5ad": train_valid_h5ad,
     }
+
+
+# Import generic, higher-level workflows after the shared utilities are defined.
+from .cross_dataset import load_and_align_datasets, prepare_cross_dataset_workflow
+from .transfer_dataset import prepare_binned_source, prepare_transfer_workflow

@@ -1,4 +1,4 @@
-"""Central configuration for reproducible K-SPADA tutorials and experiments."""
+"""Central configuration for K-SPADA tutorials and experiments."""
 
 from __future__ import annotations
 
@@ -58,33 +58,31 @@ class TrainingConfig:
 
 
 @dataclass(frozen=True)
-class LiverCancerTutorialConfig:
-    """Define the traceable historical-best liver cancer tutorial contract."""
+class ExampleDatasetTutorialConfig:
+    """Define the generic tutorial data contract."""
 
-    data_directory: Path = Path("/home/lixiangyu/TOSICA-main/data/liver_cancer")
-    historical_project_name: str = "chc_all_bs_128_5no_binning_scgpt_binning_epoch10with_no_pathway"
-    train_batches: tuple = ("1", "2")
-    validation_batches: tuple = ("3",)
-    prediction_batches: tuple = ("4",)
+    data_directory: Path = Path("/your_path/example_dataset")
+    train_batches: tuple = ("train_sample_1", "train_sample_2")
+    validation_batches: tuple = ("validation_sample",)
+    prediction_batches: tuple = ("query_sample",)
     bin_count: int = 8
     preserve_zero: bool = True
-    historical_accuracy: float = 0.8330308529945554
 
     @property
     def train_valid_path(self) -> Path:
         """Return the prepared training and validation AnnData path."""
-        return self.data_directory / "liver_cancer_train_scgpt_binning_8_with_0_chc_all_train_valid_CGraph_k_2.h5ad"
+        return self.data_directory / "train_valid_graph.h5ad"
 
     @property
     def query_paths(self) -> Dict[str, Path]:
         """Return query graph paths keyed by held-out batch identifier."""
         return {
-            batch_id: self.data_directory / f"liver_cancer_query_{batch_id}_path_scores_graph_k_2.h5ad"
+            batch_id: self.data_directory / "query_graph.h5ad"
             for batch_id in self.prediction_batches
         }
 
     def as_dict(self) -> Dict[str, object]:
-        """Return a serializable audit record for notebooks and manifests."""
+        """Return a serializable configuration record for notebooks."""
         config_values = asdict(self)
         config_values["data_directory"] = str(self.data_directory)
         config_values["train_valid_path"] = str(self.train_valid_path)
@@ -92,5 +90,5 @@ class LiverCancerTutorialConfig:
         return config_values
 
 
-BEST_LIVER_CANCER_TRAINING = TrainingConfig()
-BEST_LIVER_CANCER_TUTORIAL = LiverCancerTutorialConfig()
+DEFAULT_EXAMPLE_TRAINING = TrainingConfig()
+DEFAULT_EXAMPLE_TUTORIAL = ExampleDatasetTutorialConfig()

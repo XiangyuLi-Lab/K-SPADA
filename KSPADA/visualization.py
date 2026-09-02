@@ -1,4 +1,4 @@
-"""Spatial prediction visualizations matching the original handoff scripts."""
+"""Spatial prediction visualization utilities."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ def _read_adata(adata_input: AnnDataLike, copy: bool = True) -> ad.AnnData:
 
 
 def build_label_colors(labels: Iterable[str]) -> Dict[str, object]:
-    """Create the original ``tab20c`` label mapping used by the handoff code."""
+    """Create a stable ``tab20c`` label-color mapping."""
     unique_labels = list(dict.fromkeys(str(label) for label in labels))
     color_map = plt.colormaps.get_cmap("tab20c").resampled(max(len(unique_labels), 1))
     return {label: color_map(index) for index, label in enumerate(unique_labels)}
@@ -36,7 +36,7 @@ def plot_prediction_spatial(
     reference_adata: Optional[AnnDataLike] = None,
     point_size: float = 50,
 ):
-    """Plot ground truth and prediction using the original training-script logic."""
+    """Plot ground-truth and predicted spatial labels."""
     prediction_adata = _read_adata(adata_input, copy=True)
     required_columns = {"x", "y", "Celltype", "Prediction"}
     missing_columns = required_columns.difference(prediction_adata.obs.columns)

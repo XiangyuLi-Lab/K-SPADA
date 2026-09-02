@@ -230,7 +230,6 @@ def predict_model(
     prediction_batches: Optional[Iterable[Union[str, int]]] = None,
     cutoff: float = 0.1,
     use_gcn: bool = True,
-    include_match: bool = True,
     **predict_kwargs,
 ) -> ad.AnnData:
     """Predict cell labels and optionally write the resulting AnnData file."""
@@ -238,8 +237,8 @@ def predict_model(
     checkpoint_path = Path(model_weight_path).expanduser().resolve() if model_weight_path else latest_model_weight(model_directory)
     query_adata = _read_adata(adata_input, copy=True)
     label_name = _label_name_from_model(model_directory)
-    original_has_label = label_name in query_adata.obs
-    if not original_has_label:
+    input_has_label = label_name in query_adata.obs
+    if not input_has_label:
         query_adata.obs[label_name] = "Unknown"
     prediction_batch_list = [] if prediction_batches is None else [str(value) for value in prediction_batches]
     if use_gcn and not prediction_batch_list:
@@ -260,34 +259,10 @@ def predict_model(
     for obs_column in query_adata.obs.columns:
         if obs_column in prediction_adata.obs and len(prediction_adata.obs) == len(query_adata.obs):
             prediction_adata.obs[obs_column] = query_adata.obs[obs_column].to_numpy(copy=True)
-    if not original_has_label:
+    if not input_has_label:
         prediction_adata.obs.drop(columns=[label_name], inplace=True)
-    elif include_match:
-        prediction_adata.obs["match"] = (
-            prediction_adata.obs[label_name].astype(str) == prediction_adata.obs["Prediction"].astype(str)
-        ).astype(int)
-        prediction_adata.uns["prediction_accuracy"] = float(prediction_adata.obs["match"].mean())
     if output_path is not None:
         resolved_output_path = Path(output_path).expanduser().resolve()
         resolved_output_path.parent.mkdir(parents=True, exist_ok=True)
         prediction_adata.write_h5ad(resolved_output_path)
     return prediction_adata
-
-
-def add_prediction_match(adata_input, label_key: str = "Celltype", prediction_key: str = "Prediction", output_key: str = "match", copy: bool = True) -> ad.AnnData:
-    """Add a Boolean correctness column to prediction results."""
-    result_adata = _read_adata(adata_input, copy=copy)
-    result_adata.obs[output_key] = result_adata.obs[label_key].astype(str) == result_adata.obs[prediction_key].astype(str)
-    return result_adata
-
-
-def prediction_accuracy(adata_input, label_key: str = "Celltype", prediction_key: str = "Prediction") -> float:
-    """Return the fraction of correctly predicted cells."""
-    result_adata = _read_adata(adata_input, copy=False)
-    return float((result_adata.obs[label_key].astype(str) == result_adata.obs[prediction_key].astype(str)).mean())
-
-
-def prediction_accuracy_by_label(adata_input, label_key: str = "Celltype", prediction_key: str = "Prediction") -> pd.Series:
-    """Return prediction accuracy for each true cell label."""
-    result_adata = add_prediction_match(adata_input, label_key=label_key, prediction_key=prediction_key, copy=True)
-    return result_adata.obs.groupby(label_key, observed=False)["match"].mean().sort_values(ascending=False)

@@ -11,7 +11,7 @@ except ModuleNotFoundError:
 from pathlib import Path
 import os
 
-from .config import BEST_LIVER_CANCER_TRAINING, BEST_LIVER_CANCER_TUTORIAL, LiverCancerTutorialConfig, TrainingConfig
+from .config import DEFAULT_EXAMPLE_TRAINING, DEFAULT_EXAMPLE_TUTORIAL, ExampleDatasetTutorialConfig, TrainingConfig
 from .createCGraph import (
     add_path_scores,
     build_communication_graph,
@@ -26,7 +26,11 @@ from .data_processing import (
     bin_expression_matrix,
     bin_expression_row,
     normalize_total_log1p,
+    load_and_align_datasets,
+    prepare_binned_source,
+    prepare_cross_dataset_workflow,
     prepare_data_workflow,
+    prepare_transfer_workflow,
     read_adata,
     split_by_batch,
     standardize_obs_columns,
@@ -34,12 +38,9 @@ from .data_processing import (
     write_adata,
 )
 from .pre import (
-    add_prediction_match,
     latest_model_weight,
     prediect,
     predict_model,
-    prediction_accuracy,
-    prediction_accuracy_by_label,
 )
 from .train import fit_model, train_model
 from .visualization import build_label_colors, plot_prediction_spatial
@@ -101,12 +102,11 @@ def pre(adata, model_weight_path, project, laten=False, save_att='X_att', save_l
 
 
 __all__ = [
-    "BEST_LIVER_CANCER_TRAINING",
-    "BEST_LIVER_CANCER_TUTORIAL",
-    "LiverCancerTutorialConfig",
+    "DEFAULT_EXAMPLE_TRAINING",
+    "DEFAULT_EXAMPLE_TUTORIAL",
+    "ExampleDatasetTutorialConfig",
     "TrainingConfig",
     "add_path_scores",
-    "add_prediction_match",
     "align_adata_to_genes",
     "align_adatas_to_union_genes",
     "bin_adata",
@@ -116,13 +116,15 @@ __all__ = [
     "build_label_colors",
     "create_train_valid_cgraph",
     "latest_model_weight",
+    "load_and_align_datasets",
     "normalize_total_log1p",
     "plot_prediction_spatial",
     "pre",
     "predict_model",
-    "prediction_accuracy",
-    "prediction_accuracy_by_label",
+    "prepare_binned_source",
+    "prepare_cross_dataset_workflow",
     "prepare_data_workflow",
+    "prepare_transfer_workflow",
     "prepare_query_cgraph",
     "read_adata",
     "split_by_batch",
